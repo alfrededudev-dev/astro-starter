@@ -1,0 +1,143 @@
+---
+import "../../styles/global.css";
+import {SEO} from "astro-seo";
+import type {SeoOptions} from "../lib/seo"
+
+interface Props extends SeoOptions {
+  bodyClass?: string
+}
+
+const {
+  title,
+  titleTemplate,
+  titleDefault = "Website",
+  description = "",
+  lang = "en",
+
+  noIndex = false,
+  noFollow = false,
+  noArchive = false,
+  noCache = false,
+  robotsExtras,
+
+  canonical,
+  image,
+  imageAlt,
+
+  openGraph = {},
+  twitter = {},
+  article,
+  languageAlternates = [],
+  jsonLd,
+
+  bodyClass = "",
+} = Astro.props
+
+// Site URL comes from SITE_URL in astro.config.mjs.
+// Astro.url is used as a fallback in development.
+const baseUrl = Astro.site ?? Astro.url
+const resolveUrl = (value: string): string => new URL(value, baseUrl).toString()
+const pageUrl = resolveUrl(Astro.url.pathname)
+
+// Omit canonical on non-indexable pages.
+// Explicit canonical: null also disables it.
+const canonicalUrl = noIndex || canonical === null ? undefined : resolveUrl(canonical ?? Astro.url.pathname)
+
+// Social metadata
+const resolvedTitle = title ?? titleDefault
+const socialTitle = openGraph.title ?? resolvedTitle
+const socialDescription = openGraph.description ?? description
+const socialImage = openGraph.image ?? image
+const socialImageUrl = socialImage ? resolveUrl(socialImage) : undefined
+const socialImageAlt = openGraph.imageAlt ?? imageAlt
+const socialType = openGraph.type ?? (article ? "article" : "website")
+
+// Open Graph requires a complete basic object.
+// Do not emit incomplete OG metadata without an image.
+const openGraphData = socialImageUrl
+  ? {
+      basic: {
+        title: socialTitle,
+        type: socialType,
+        image: socialImageUrl,
+        url: canonicalUrl ?? pageUrl,
+      },
+      optional: {
+        description: socialDescription,
+        ...(openGraph.locale && { locale: openGraph.locale}),
+        ...(openGraph.localeAlternate && {localeAlternate: openGraph.localeAlternate}),
+        ...(openGraph.siteName && {siteName: openGraph.siteName}),
+      },
+      image: {
+        ...(socialImageAlt && { alt: socialImageAlt}),
+        ...(openGraph.imageWidth && {width: openGraph.imageWidth}),
+        ...(openGraph.imageHeight && {height: openGraph.imageHeight}),
+        ...(openGraph.imageType && {type: openGraph.imageType}),
+      },
+      ...(article && {article}),
+    }
+  : undefined
+
+// Twitter / X
+const twitterImageUrl = twitter.image ? resolveUrl(twitter.image) : socialImageUrl
+
+const twitterData = {
+  card: twitter.card ?? (twitterImageUrl ? "summary_large_image" : "summary"),
+  title: twitter.title ?? socialTitle,
+  description: twitter.description ?? socialDescription,
+
+  ...(twitterImageUrl && {image: twitterImageUrl, imageAlt: twitter.imageAlt ?? socialImageAlt ?? socialTitle,}),
+  ...(twitter.site && {site: twitter.site,}),
+  ...(twitter.creator && {creator: twitter.creator}),
+}
+
+// Hreflang
+const alternates = languageAlternates.map(item => ({hrefLang: item.hrefLang, href: resolveUrl(item.href)}))
+
+// JSON-LD
+// Escaping "<" prevents breaking out of the script element.
+const structuredData = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : undefined
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <script is:inline>
+        const setHtmlFontSize = (width) => {document.documentElement.style.fontSize = window.innerWidth / width + "px";};
+        const updateHtmlFontSize = () => {window.innerWidth >= 992 ? setHtmlFontSize(1440) : setHtmlFontSize(360);};
+        updateHtmlFontSize();
+        window.addEventListener("resize", updateHtmlFontSize);
+    </script>
+
+    <SEO
+      title={title}
+      titleTemplate={titleTemplate}
+      titleDefault={titleDefault}
+      description={description}
+      charset="UTF-8"
+
+      canonical={canonicalUrl}
+      noindex={noIndex}
+      nofollow={noFollow}
+      noarchive={noArchive}
+      nocache={noCache}
+      robotsExtras={robotsExtras}
+
+      openGraph={openGraphData}
+      twitter={twitterData}
+      languageAlternates={alternates}
+    />
+
+    {structuredData && (<script type="application/ld+json" set:html={structuredData}/>)}
+
+    <!-- Extensions -->
+    <slot name="head" />
+  </head>
+
+  <body class:list={["min-h-screen bg-background text-foreground", bodyClass]}>
+    <slot />
+  </body>
+</html>

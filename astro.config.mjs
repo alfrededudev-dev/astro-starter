@@ -3,49 +3,56 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import playformCompress from "@playform/compress";
 import sitemap, { ChangeFreqEnum } from "@astrojs/sitemap";
+import alpinejs from "@astrojs/alpinejs";
+
+const site = process.env.SITE_URL
+// System routes excluded from sitemap.
+const excludedRoutes = [
+  "/admin",
+  "/draft",
+  "/preview",
+  "/api",
+];
+
+/**
+ * @param {string} pathname
+ * @returns {boolean}
+ */
+function isExcludedPath(pathname) {
+  return excludedRoutes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
 
 // ====== ОСНОВНАЯ КОНФИГУРАЦИЯ ======
 export default defineConfig({
-  site: "https://example.com",
+  site,
+  vite: {plugins: [tailwindcss()]},
 
-  vite: {
-    plugins: [tailwindcss()],
-  },
+  integrations: [// ====== 1. SITEMAP ======
+    ...(site ?
+      [sitemap({
+        filter: (page) => {
+          const pathname = new URL(page).pathname;
+          return !isExcludedPath(pathname);
+        },
 
-  integrations: [
-    // ====== 1. SITEMAP ======
-    sitemap({
-      filter: (page) => {
-        // Исключаем системные пути
-        const url = new URL(page);
-        const pathname = url.pathname;
+        changefreq: ChangeFreqEnum.WEEKLY,
+        priority: 0.7,
 
-        // Не включаем в sitemap черновики и админку
-        if (
-          ["/admin", "/draft", "/preview", "/_astro", "/api"].some((p) =>
-            pathname.startsWith(p),
-          )
-        ) {
-          return false;
-        }
-        return true;
-      },
+        serialize: (item) => {
+          const pathname = new URL(item.url).pathname;
+          if (pathname === "/") {
+                item.priority = 1.0;
+                item.changefreq = ChangeFreqEnum.DAILY;
+          }
 
-      // Стандартные значения для всех страниц
-      changefreq: "weekly",
-      priority: 0.7,
-
-      // Автоматическая настройка приоритетов
-      serialize: (item) => {
-        if (item.url === "https://example.com/") {
-          item.priority = 1.0;
-          item.changefreq = ChangeFreqEnum.DAILY;
-        }
-        return item;
-      },
-    }),
-
-    // ====== 2. COMPRESS  ======
+          return item;
+        },
+      })] : []
+    ), 
+    alpinejs(),
+    
+    // ====== COMPRESS  ======
+    // Must be the last integration.
     playformCompress({
       HTML: {
         "html-minifier-terser": {
@@ -64,11 +71,8 @@ export default defineConfig({
       },
       JSON: true,
       SVG: true,
-
-      // Исключаем стандартные файлы
       Exclude: [/\.min\.(js|css)$/, /service-worker\.js$/, /\.map$/],
-
       Logger: 1,
-    }),
+    })
   ],
 });

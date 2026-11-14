@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body{
+  font-size: 14rem;
+}
+
 /*
  * Fluid rem: CSS fallback + optional layout script.
  * Брейкпоинт md переключает --artboard; скрипт только считает font-size.
@@ -37,10 +41,185 @@
   --text-4xl--line-height: 1.2;
 
   /* Hairline borders stay visible when 1rem becomes sub-pixel on desktop */
-  --default-border-width: 1px;
-  --default-ring-width: 1px;
+  --default-border-width: 1rem;
+  --default-ring-width: 1rem;
+
+  /* ========================================
+     PRIMARY PALETTE
+     ======================================== */
+
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* ========================================
+     SECONDARY PALETTE
+     ======================================== */
+
+  --color-secondary-50: #f5f3ff;
+  --color-secondary-100: #ede9fe;
+  --color-secondary-200: #ddd6fe;
+  --color-secondary-300: #c4b5fd;
+  --color-secondary-400: #a78bfa;
+  --color-secondary-500: #8b5cf6;
+  --color-secondary-600: #7c3aed;
+  --color-secondary-700: #6d28d9;
+  --color-secondary-800: #5b21b6;
+  --color-secondary-900: #4c1d95;
+  --color-secondary-950: #2e1065;
+
+  /* ========================================
+     ACCENT PALETTE
+     ======================================== */
+
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+  --color-accent-700: #c2410c;
+  --color-accent-800: #9a3412;
+  --color-accent-900: #7c2d12;
+  --color-accent-950: #431407;
+
+  /* ========================================
+     NEUTRAL PALETTE
+     ======================================== */
+
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  --color-neutral-950: #0a0a0a;
 }
 
+/* ========================================
+   SEMANTIC COLORS
+   ======================================== */
+
+:root {
+  /* Brand */
+  --cms-primary: var(--color-primary-600);
+  --cms-secondary: var(--color-secondary-600);
+  --cms-accent: var(--color-accent-500);
+
+  /* Contrasting content */
+  --cms-primary-foreground: #ffffff;
+  --cms-secondary-foreground: #ffffff;
+  --cms-accent-foreground: #ffffff;
+
+  /* Backgrounds */
+  --cms-background: #ffffff;
+  --cms-background-subtle: var(--color-neutral-50);
+  --cms-background-muted: var(--color-neutral-100);
+
+  /* Text */
+  --cms-foreground: var(--color-neutral-950);
+  --cms-foreground-muted: var(--color-neutral-600);
+  --cms-foreground-subtle: var(--color-neutral-500);
+
+  /* Surfaces */
+  --cms-surface: #ffffff;
+  --cms-surface-hover: var(--color-neutral-50);
+  --cms-surface-foreground: var(--color-neutral-950);
+
+  /* Borders */
+  --cms-border: var(--color-neutral-200);
+  --cms-border-light: var(--color-neutral-100);
+  --cms-border-strong: var(--color-neutral-400);
+
+  /* Forms */
+  --cms-input: #ffffff;
+  --cms-input-border: var(--color-neutral-300);
+  --cms-placeholder: var(--color-neutral-400);
+  --cms-ring: var(--color-primary-500);
+
+  /* States */
+  --cms-success: #16a34a;
+  --cms-warning: #d97706;
+  --cms-danger: #dc2626;
+  --cms-info: #0284c7;
+
+  --cms-success-foreground: #ffffff;
+  --cms-warning-foreground: #ffffff;
+  --cms-danger-foreground: #ffffff;
+  --cms-info-foreground: #ffffff;
+
+  /* Disabled */
+  --cms-disabled: var(--color-neutral-200);
+  --cms-disabled-foreground: var(--color-neutral-500);
+
+  /* Misc */
+  --cms-overlay: rgb(0 0 0 / 50%);
+  --cms-selection: var(--color-primary-200);
+}
+
+/* ========================================
+   TAILWIND SEMANTIC UTILITIES
+   ======================================== */
+
+@theme inline {
+  --color-primary: var(--cms-primary);
+  --color-secondary: var(--cms-secondary);
+  --color-accent: var(--cms-accent);
+
+  --color-primary-foreground: var(--cms-primary-foreground);
+  --color-secondary-foreground: var(--cms-secondary-foreground);
+  --color-accent-foreground: var(--cms-accent-foreground);
+
+  --color-background: var(--cms-background);
+  --color-background-subtle: var(--cms-background-subtle);
+  --color-background-muted: var(--cms-background-muted);
+
+  --color-foreground: var(--cms-foreground);
+  --color-foreground-muted: var(--cms-foreground-muted);
+  --color-foreground-subtle: var(--cms-foreground-subtle);
+
+  --color-surface: var(--cms-surface);
+  --color-surface-hover: var(--cms-surface-hover);
+  --color-surface-foreground: var(--cms-surface-foreground);
+
+  --color-border: var(--cms-border);
+  --color-border-light: var(--cms-border-light);
+  --color-border-strong: var(--cms-border-strong);
+
+  --color-input: var(--cms-input);
+  --color-input-border: var(--cms-input-border);
+  --color-placeholder: var(--cms-placeholder);
+  --color-ring: var(--cms-ring);
+
+  --color-success: var(--cms-success);
+  --color-warning: var(--cms-warning);
+  --color-danger: var(--cms-danger);
+  --color-info: var(--cms-info);
+
+  --color-success-foreground: var(--cms-success-foreground);
+  --color-warning-foreground: var(--cms-warning-foreground);
+  --color-danger-foreground: var(--cms-danger-foreground);
+  --color-info-foreground: var(--cms-info-foreground);
+
+  --color-disabled: var(--cms-disabled);
+  --color-disabled-foreground: var(--cms-disabled-foreground);
+
+  --color-overlay: var(--cms-overlay);
+  --color-selection: var(--cms-selection);
+}
 
 @utility container {
   @apply mx-auto w-full max-w-[360rem] px-3 md:max-w-[1240rem];
